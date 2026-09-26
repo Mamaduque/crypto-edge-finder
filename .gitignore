@@ -1,0 +1,41 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import yaml
+
+from .data_collector import DataCollector
+from .edge_detector import EdgeDetector
+
+
+def load_config(path: str | Path) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Scanner de edge em cripto")
+    parser.add_argument("--config", type=str, default="config.yaml", help="Caminho do arquivo de configuração")
+    args = parser.parse_args()
+
+    cfg = load_config(args.config)
+    exchanges = cfg.get("exchanges", ["binance", "bybit", "okx"])
+    symbols = cfg.get("symbols", ["BTC/USDT", "ETH/USDT"]) 
+    timeframe = cfg.get("interval", "15m")
+    limit = int(cfg.get("limit", 500))
+    min_spread_pct = float(cfg.get("min_spread_pct", 0.3))
+    min_zscore = float(cfg.get("min_zscore", 1.5))
+
+    collector = DataCollector(exchanges)
+    collected = collector.collect(symbols=symbols, timeframe=timeframe, limit=limit)
+
+    detector = EdgeDetector(min_spread_pct=min_spread_pct, min_zscore=min_zscore)
+    opportunities = detector.scan(collected)
+
+    print(json.dumps(opportunities, indent=2, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

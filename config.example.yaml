@@ -1,0 +1,30 @@
+# Configuração de exemplo para scanner de edge em cripto
+
+# Exchanges que serão consultadas
+exchanges:
+  - binance
+  - bybit
+  - okx
+  - kucoin
+
+# Símbolos para análise
+symbols:
+  - BTC/USDT
+  - ETH/USDT
+  - SOL/USDT
+  - XRP/USDT
+  - DOGE/USDT
+
+# Janela de histórico
+# 1m, 5m, 15m, 1h, 4h
+interval: "15m"
+limit: 500
+
+# Thresholds para edge
+min_spread_pct: 0.30
+min_volume_ratio: 1.0
+min_zscore: 1.5
+max_risk_per_trade: 0.02
+
+# Flags
+verbose: true
